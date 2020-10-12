@@ -8,7 +8,7 @@ public:
 	void ResetBoard();
 	bool CheckWin();
 	bool CheckOccupied(char team1, char team2, int index);
-	bool CheckDraw();
+	bool CheckFull();
 	void Pause();
 	void ClearScreen();
 public:

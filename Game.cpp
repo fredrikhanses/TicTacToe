@@ -44,16 +44,9 @@ bool Game::CheckWin()
 			return true;
 		}
 	}
-	if (pos[1] != ' ')
+	if (pos[4] != ' ')
 	{
-		if ((pos[1] == pos[4] && pos[1] == pos[7]))
-		{
-			return true;
-		}
-	}
-	if (pos[3] != ' ')
-	{
-		if ((pos[3] == pos[4] && pos[3] == pos[5]))
+		if ((pos[4] == pos[3] && pos[4] == pos[5]) || (pos[4] == pos[1] && pos[4] == pos[7]) || (pos[4] == pos[6] && pos[4] == pos[2]))
 		{
 			return true;
 		}
@@ -85,7 +78,7 @@ bool Game::CheckOccupied(char team1, char team2, int index)
 	return false;
 }
 
-bool Game::CheckDraw()
+bool Game::CheckFull()
 {
 	for (char character : pos)
 	{
