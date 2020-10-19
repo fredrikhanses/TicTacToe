@@ -60,7 +60,7 @@ int AI::GetIndex(unsigned int firstIndex, unsigned int secondIndex)
 {
 	if (firstIndex == 0)
 	{
-		return firstIndex + secondIndex + 5;
+		return firstIndex + secondIndex + 1;
 	}
 	else if (firstIndex == 1)
 	{
@@ -68,7 +68,7 @@ int AI::GetIndex(unsigned int firstIndex, unsigned int secondIndex)
 	}	
 	else //(firstIndex == 2)
 	{
-		return firstIndex + secondIndex + 1;
+		return firstIndex + secondIndex + 5;
 	}
 }
 
@@ -147,7 +147,7 @@ AI::AI(char emptyMarker, char playerOneName, char playerTwoName)
 	aiPlayer = playerTwoName;
 }
 
-int AI::FindBestPosition(char (&gameBoard)[3][3], bool playerOneStart)
+int AI::MiniMax(char (&gameBoard)[3][3])
 {
 	int bestMoveScore = std::numeric_limits<int>::max();
 	unsigned int bestMove = 0;
@@ -164,23 +164,9 @@ int AI::FindBestPosition(char (&gameBoard)[3][3], bool playerOneStart)
 					bestMoveScore = tempMoveScore;
 					bestMove = GetIndex(i, j);
 				}
-				DisplayBoard(gameBoard);
 				gameBoard[i][j] = freeMarker;
-				std::cout << "bestMoveScore is: " << bestMoveScore << std::endl;
-				std::cout << "bestMove is: " << bestMove << std::endl;
 			}
 		}
 	}
 	return bestMove;
-}
-
-void AI::DisplayBoard(char (&gameBoard)[3][3])
-{
-	cout << "_____________      _____________" << std::endl
-		<< "| " << gameBoard[2][0] << " | " << gameBoard[2][1] << " | " << gameBoard[2][2] << " |      | 7 | 8 | 9 |" << std::endl
-		<< "-------------      -------------" << std::endl
-		<< "| " << gameBoard[1][0] << " | " << gameBoard[1][1] << " | " << gameBoard[1][2] << " |      | 4 | 5 | 6 |" << std::endl
-		<< "-------------      -------------" << std::endl
-		<< "| " << gameBoard[0][0] << " | " << gameBoard[0][1] << " | " << gameBoard[0][2] << " |      | 1 | 2 | 3 |" << std::endl
-		<< "-------------      -------------" << std::endl;
 }

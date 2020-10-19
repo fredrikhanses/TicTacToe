@@ -2,7 +2,6 @@
 class AI
 {
 private:
-	void DisplayBoard(char (&gameBoard)[3][3]);
 	bool CheckFull(char (&gameBoard)[3][3]);
 	int MinSearch(char (&gameBoard)[3][3]);
 	int MaxSearch(char (&gameBoard)[3][3]);
@@ -13,5 +12,5 @@ private:
 	char aiPlayer;
 public:
 	AI(char emptyMarker, char playerOneName, char playerTwoName);
-	int FindBestPosition(char (&gameBoard)[3][3], bool playerOneStart);
+	int MiniMax(char (&gameBoard)[3][3]);
 };

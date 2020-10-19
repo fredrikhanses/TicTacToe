@@ -75,7 +75,7 @@ void TicTacToe::ShowGameOverScreen(Game& game, bool useAI, bool playerOneTurn)
 		}
 		else
 		{
-			winningPlayer = "Mr AI";
+			winningPlayer = "Mr AI!";
 			defeatedPlayer = "Player 1!";
 		}
 	}
@@ -143,9 +143,8 @@ void TicTacToe::ShowDrawScreen(Game& game)
 void TicTacToe::AITurn(AI& ai, Game& game)
 {
 	unsigned int index;
-	std::cout << "Waiting for AI opponent.." << std::endl;
-	index = ai.FindBestPosition(game.gameBoard, playerOneStart);
-	//ClearScreen();
+	index = ai.MiniMax(game.gameBoard);
+	ClearScreen();
 	std::cout << "AI opponent placed marker at position " << index << std::endl;
 	game.InsertMarker(index, playerOneTurn);
 }
