@@ -1,5 +1,4 @@
-﻿#include <iostream>
-#include "AI.h"
+﻿#include "AI.h"
 using namespace std;
 
 bool AI::CheckFull(char (&gameBoard)[3][3])
@@ -86,7 +85,7 @@ int AI::MinSearch(char (&gameBoard)[3][3])
 	{
 		return 0;
 	}
-	int bestMoveScore = std::numeric_limits<int>::max();
+	int bestMoveScore = 100;
 	for (unsigned int i = 0; i < 3; i++)
 	{
 		for (unsigned int j = 0; j < 3; j++)
@@ -120,7 +119,7 @@ int AI::MaxSearch(char(&gameBoard)[3][3])
 	{
 		return 0;
 	}
-	int bestMoveScore = std::numeric_limits<int>::min();
+	int bestMoveScore = -100;
 	for (unsigned int i = 0; i < 3; i++)
 	{
 		for (unsigned int j = 0; j < 3; j++)
@@ -149,7 +148,7 @@ AI::AI(char emptyMarker, char playerOneName, char playerTwoName)
 
 int AI::MiniMax(char (&gameBoard)[3][3])
 {
-	int bestMoveScore = std::numeric_limits<int>::max();
+	int bestMoveScore = 100;
 	unsigned int bestMove = 0;
 	for (unsigned int i = 0; i < 3; i++)
 	{
@@ -165,6 +164,7 @@ int AI::MiniMax(char (&gameBoard)[3][3])
 					bestMove = GetIndex(i, j);
 				}
 				gameBoard[i][j] = freeMarker;
+
 			}
 		}
 	}

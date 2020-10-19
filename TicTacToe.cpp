@@ -50,7 +50,6 @@ void TicTacToe::Play()
 		win = game.CheckWin();
 		if (win)
 		{
-			ClearScreen();
 			ShowGameOverScreen(game, useAI, playerOneTurn);
 		}
 		else if (game.CheckFull())
@@ -63,6 +62,7 @@ void TicTacToe::Play()
 
 void TicTacToe::ShowGameOverScreen(Game& game, bool useAI, bool playerOneTurn)
 {
+	ClearScreen();
 	char answer;
 	string winningPlayer;
 	string defeatedPlayer;
@@ -92,15 +92,28 @@ void TicTacToe::ShowGameOverScreen(Game& game, bool useAI, bool playerOneTurn)
 			defeatedPlayer = "Player 1!";
 		}
 	}
-	std::cout << "Congratulations " << winningPlayer << std::endl << "You won against " << defeatedPlayer << std::endl;
+	std::cout << "Congratulations " << winningPlayer << std::endl 
+	<< "You won against " << defeatedPlayer << std::endl;
 	game.DisplayBoard();
-	std::cout << "Play again?" << std::endl <<"Insert Y for yes or N for no" << std::endl;
+	std::cout << "Play again?" << std::endl
+	<< "Insert Y to play again," << std::endl
+	<< "Insert M to change mode," << std::endl
+	<< "Insert N to quit" << std::endl;
 	std::cin >> answer;
 	if (answer == 'y' || answer == 'Y')
 	{
 		playerOneStart = !playerOneStart;
 		game.ResetBoard();
 		win = false;
+		ClearScreen();
+	}
+	else if (answer == 'm' || answer == 'M')
+	{
+		ClearScreen();
+		playerOneStart = !playerOneStart;
+		game.ResetBoard();
+		win = false;
+		useAI = SelectMode();
 		ClearScreen();
 	}
 	else if (answer == 'n' || answer == 'N')
@@ -116,17 +129,29 @@ void TicTacToe::ShowGameOverScreen(Game& game, bool useAI, bool playerOneTurn)
 
 void TicTacToe::ShowDrawScreen(Game& game)
 {
+	ClearScreen();
 	char answer;
+	std::cout << "Draw!" << std::endl;
 	game.DisplayBoard();
-	std::cout << "Draw!" << std::endl
-		<< "Play again?" << std::endl
-		<< "Insert Y for yes or N for no" << std::endl;
+	std::cout << "Play again?" << std::endl
+	<< "Insert Y to play again," << std::endl
+	<< "Insert M to change mode," << std::endl
+	<< "Insert N to quit" << std::endl;
 	std::cin >> answer;
 	if (answer == 'y' || answer == 'Y')
 	{
 		playerOneStart = !playerOneStart;
 		game.ResetBoard();
 		win = false;
+		ClearScreen();
+	}
+	else if (answer == 'm' || answer == 'M')
+	{
+		ClearScreen();
+		playerOneStart = !playerOneStart;
+		game.ResetBoard();
+		win = false;
+		useAI = SelectMode();
 		ClearScreen();
 	}
 	else if (answer == 'n' || answer == 'N')
@@ -193,12 +218,15 @@ bool TicTacToe::SelectMode()
 
 void TicTacToe::HumanTurn(Game& game, bool playerOneTurn)
 {
-	unsigned int index;
+	char input;
 	game.DisplayBoard();
 	std::cout << "Player " << !playerOneTurn + 1 << "'s turn" << std::endl;
 	std::cout << "Insert 1 to 9 to place your marker" << std::endl;
-	std::cin >> index;
+	std::cin >> input;
+	string restofline;
+	getline(cin, restofline);
 	ClearScreen();
+	unsigned int index = input - '0';
 	if (index < 1 || index > 9)
 	{
 		std::cout << index << " is not a valid position" << std::endl;
