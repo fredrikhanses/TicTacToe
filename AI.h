@@ -1,11 +1,17 @@
 #pragma once
-#include "Game.h"
 class AI
 {
 private:
-	int MiniMax(char board[9], int depth, bool AITurn, Game game, char playerOneName, char playerTwoName);
-	int CheckWin(char pos[9], char playerOneName, char playerTwoName);
+	void DisplayBoard(char (&gameBoard)[3][3]);
+	bool CheckFull(char (&gameBoard)[3][3]);
+	int MinSearch(char (&gameBoard)[3][3]);
+	int MaxSearch(char (&gameBoard)[3][3]);
+	bool CheckWin(char (&gameBoard)[3][3], char player);
+	int GetIndex(unsigned int firstIndex, unsigned int secondIndex);
+	char freeMarker;
+	char humanPlayer;
+	char aiPlayer;
 public:
-	int FindBestPosition(char board[9], Game game, char playerOneName, char playerTwoName);
+	AI(char emptyMarker, char playerOneName, char playerTwoName);
+	int FindBestPosition(char (&gameBoard)[3][3], bool playerOneStart);
 };
-

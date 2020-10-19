@@ -2,161 +2,185 @@
 #include "AI.h"
 using namespace std;
 
-int AI::CheckWin(char pos[9], char playerOneName, char playerTwoName)
+bool AI::CheckFull(char (&gameBoard)[3][3])
 {
-	if (pos[0] != ' ')
+	for (unsigned int i = 0; i < 3; i++)
 	{
-		if ((pos[0] == pos[1] && pos[0] == pos[2]) || (pos[0] == pos[3] && pos[0] == pos[6]) || (pos[0] == pos[4] && pos[0] == pos[8]))
+		for (unsigned int j = 0; j < 3; j++)
 		{
-			if (pos[0] == playerOneName)
+			if (gameBoard[i][j] == freeMarker)
 			{
-				return 10;
-			}
-			else if (pos[0] == playerTwoName)
-			{
-				return -10;
+				return false;
 			}
 		}
 	}
-	if (pos[4] != ' ')
-	{
-		if ((pos[4] == pos[3] && pos[4] == pos[5]) || (pos[4] == pos[1] && pos[4] == pos[7]) || (pos[4] == pos[6] && pos[4] == pos[2]))
-		{
-			if (pos[4] == playerOneName)
-			{
-				return 10;
-			}
-			else if (pos[4] == playerTwoName)
-			{
-				return -10;
-			}
-		}
-	}
-	if (pos[8] != ' ')
-	{
-		if ((pos[8] == pos[7] && pos[8] == pos[6]) || (pos[8] == pos[5] && pos[8] == pos[2]))
-		{
-			if (pos[8] == playerOneName)
-			{
-				return 10;
-			}
-			else if (pos[8] == playerTwoName)
-			{
-				return -10;
-			}
-		}
-	}
-	return 0;
+	return true;
 }
 
-// This is the minimax function. It considers all 
-// the possible ways the game can go and returns 
-// the value of the board 
-int AI::MiniMax(char pos[9], int depth, bool isMax, Game game, char playerOneName, char playerTwoName)
+bool AI::CheckWin(char (&gameBoard)[3][3], char player)
 {
-	int score = CheckWin(pos, playerOneName, playerTwoName);
-
-	// If Maximizer or Minimizer has won the game return his/her evaluated score 
-	if (score == 10 || score == -10)
+	for (unsigned int i = 0; i < 3; i++)
 	{
-		return score;
+		// Check rows
+		if (gameBoard[i][0] != freeMarker)
+		{
+			if (gameBoard[i][0] == player && gameBoard[i][1] == player && gameBoard[i][2] == player)
+			{
+				return true;
+			}
+		}
+		// Check columns
+		if (gameBoard[0][i] != freeMarker)
+		{
+			if (gameBoard[0][i] == player && gameBoard[1][i] == player && gameBoard[2][i] == player)
+			{
+				return true;
+			}
+		}
 	}
-	// If there are no more moves and no winner then it is a tie 
-	else if (game.CheckFull())
+	// Check diagonals
+	if (gameBoard[0][0] != freeMarker)
+	{
+		if (gameBoard[0][0] == player && gameBoard[1][1] == player && gameBoard[2][2] == player)
+		{
+			return true;
+		}
+	}
+	if (gameBoard[0][2] != freeMarker)
+	{
+		if (gameBoard[0][2] == player && gameBoard[1][1] == player && gameBoard[2][0] == player)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+int AI::GetIndex(unsigned int firstIndex, unsigned int secondIndex)
+{
+	if (firstIndex == 0)
+	{
+		return firstIndex + secondIndex + 5;
+	}
+	else if (firstIndex == 1)
+	{
+		return firstIndex + secondIndex + 3;
+	}	
+	else //(firstIndex == 2)
+	{
+		return firstIndex + secondIndex + 1;
+	}
+}
+
+int AI::MinSearch(char (&gameBoard)[3][3])
+{
+	if (CheckWin(gameBoard, humanPlayer))
+	{
+		return 10;
+	}
+	else if (CheckWin(gameBoard, aiPlayer))
+	{
+		return -10;
+	}
+	else if (CheckFull(gameBoard))
 	{
 		return 0;
 	}
-
-	// If this maximizer's move 
-	if (isMax)
+	int bestMoveScore = std::numeric_limits<int>::max();
+	for (unsigned int i = 0; i < 3; i++)
 	{
-		int best = -1000;
-
-		// Traverse all cells 
-		for (int i = 0; i < 9; i++)
+		for (unsigned int j = 0; j < 3; j++)
 		{
-			// Check if cell is empty 
-			if (pos[i] == ' ')
+			if (gameBoard[i][j] == freeMarker)
 			{
-				// Make the move 
-				pos[i] = playerOneName;
-
-				// Call minimax recursively and choose the maximum value 
-				int current = MiniMax(pos, depth + 1, !isMax, game, playerOneName, playerTwoName);
-				if (current > best)
+				gameBoard[i][j] = aiPlayer;
+				int tempMoveScore = MaxSearch(gameBoard);
+				if (tempMoveScore <= bestMoveScore)
 				{
-					best = current;
+					bestMoveScore = tempMoveScore;
 				}
-
-				// Undo the move 
-				pos[i] = ' ';
+				gameBoard[i][j] = freeMarker;
 			}
 		}
-		return best;
 	}
-
-	// If this minimizer's move 
-	else
-	{
-		int best = 1000;
-
-		// Traverse all cells 
-		for (int i = 0; i < 9; i++)
-		{
-			// Check if cell is empty 
-			if (pos[i] == ' ')
-			{
-				// Make the move 
-				pos[i] = playerTwoName;
-
-				// Call minimax recursively and choose the minimum value
-				int current = MiniMax(pos, depth + 1, !isMax, game, playerOneName, playerTwoName);
-				if (current < best)
-				{
-					best = current;
-				}
-
-				// Undo the move 
-				pos[i] = ' ';
-			}
-		}
-		return best;
-	}
+	return bestMoveScore;
 }
 
-// This will return the best possible move for the player 
-int AI::FindBestPosition(char pos[9], Game game, char playerOneName, char playerTwoName)
+int AI::MaxSearch(char(&gameBoard)[3][3])
 {
-	int bestValue = -1000;
-	int bestIndex = -1;
-
-	// Traverse all cells, evaluate minimax function for 
-	// all empty cells. And return the cell with optimal value. 
-	for (int i = 0; i < 9; i++)
+	if (CheckWin(gameBoard, humanPlayer))
 	{
-		std::cout << "board[" << i << "] is: " << pos[i] << "\n";
-		// Check if cell is empty 
-		if (pos[i] == ' ')
-		{
-			// Make the move 
-			pos[i] = playerOneName;
-
-			// compute evaluation function for this move. 
-			int currentValue = MiniMax(pos, 0, false, game, playerOneName, playerTwoName);
-
-			// Undo the move 
-			pos[i] = ' ';
-
-			// If the value of the current move is 
-			// more than the best value, then update best
-			if (currentValue > bestValue)
-			{
-				bestIndex = i;
-				bestValue = currentValue;
-			}
-		}	
+		return 10;
 	}
-	std::cout << "bestValue is: " << bestValue << "\n";
-	std::cout << "bestIndex is: " << bestIndex << "\n";
-	return bestIndex;
+	else if (CheckWin(gameBoard, aiPlayer))
+	{
+		return -10;
+	}
+	else if(CheckFull(gameBoard))
+	{
+		return 0;
+	}
+	int bestMoveScore = std::numeric_limits<int>::min();
+	for (unsigned int i = 0; i < 3; i++)
+	{
+		for (unsigned int j = 0; j < 3; j++)
+		{
+			if (gameBoard[i][j] == freeMarker)
+			{
+				gameBoard[i][j] = humanPlayer;
+				int tempMoveScore = MinSearch(gameBoard);
+				if (tempMoveScore >= bestMoveScore)
+				{
+					bestMoveScore = tempMoveScore;
+				}
+				gameBoard[i][j] = freeMarker;
+			}
+		}
+	}
+	return bestMoveScore;
+}
+
+AI::AI(char emptyMarker, char playerOneName, char playerTwoName)
+{
+	freeMarker = emptyMarker;
+	humanPlayer = playerOneName;
+	aiPlayer = playerTwoName;
+}
+
+int AI::FindBestPosition(char (&gameBoard)[3][3], bool playerOneStart)
+{
+	int bestMoveScore = std::numeric_limits<int>::max();
+	unsigned int bestMove = 0;
+	for (unsigned int i = 0; i < 3; i++)
+	{
+		for (unsigned int j = 0; j < 3; j++)
+		{
+			if (gameBoard[i][j] == freeMarker)
+			{
+				gameBoard[i][j] = aiPlayer;
+				int tempMoveScore = MaxSearch(gameBoard);
+				if (tempMoveScore <= bestMoveScore)
+				{
+					bestMoveScore = tempMoveScore;
+					bestMove = GetIndex(i, j);
+				}
+				DisplayBoard(gameBoard);
+				gameBoard[i][j] = freeMarker;
+				std::cout << "bestMoveScore is: " << bestMoveScore << std::endl;
+				std::cout << "bestMove is: " << bestMove << std::endl;
+			}
+		}
+	}
+	return bestMove;
+}
+
+void AI::DisplayBoard(char (&gameBoard)[3][3])
+{
+	cout << "_____________      _____________" << std::endl
+		<< "| " << gameBoard[2][0] << " | " << gameBoard[2][1] << " | " << gameBoard[2][2] << " |      | 7 | 8 | 9 |" << std::endl
+		<< "-------------      -------------" << std::endl
+		<< "| " << gameBoard[1][0] << " | " << gameBoard[1][1] << " | " << gameBoard[1][2] << " |      | 4 | 5 | 6 |" << std::endl
+		<< "-------------      -------------" << std::endl
+		<< "| " << gameBoard[0][0] << " | " << gameBoard[0][1] << " | " << gameBoard[0][2] << " |      | 1 | 2 | 3 |" << std::endl
+		<< "-------------      -------------" << std::endl;
 }

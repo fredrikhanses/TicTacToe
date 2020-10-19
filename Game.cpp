@@ -2,58 +2,113 @@
 #include "Game.h"
 using namespace std;
 
+Game::Game(char emptyMarker, char playerOneName, char playerTwoName)
+{
+	freeMarker = emptyMarker;
+	humanPlayer = playerOneName;
+	aiPlayer = playerTwoName;
+}
+
 void Game::DisplayBoard()
 {
-	cout << "_____________      _____________\n"
-		 << "| " << pos[6] << " | " << pos[7] << " | " << pos[8] << " |      | 7 | 8 | 9 |\n"
-		 << "-------------      -------------\n"
-		 << "| " << pos[3] << " | " << pos[4] << " | " << pos[5] << " |      | 4 | 5 | 6 |\n"
-		 << "-------------      -------------\n"
-		 << "| " << pos[0] << " | " << pos[1] << " | " << pos[2] << " |      | 1 | 2 | 3 |\n"
-		 << "-------------      -------------\n";
+	cout << "_____________      _____________" << std::endl
+		 << "| " << gameBoard[2][0] << " | " << gameBoard[2][1] << " | " << gameBoard[2][2] << " |      | 7 | 8 | 9 |" << std::endl
+		 << "-------------      -------------" << std::endl
+		 << "| " << gameBoard[1][0] << " | " << gameBoard[1][1] << " | " << gameBoard[1][2] << " |      | 4 | 5 | 6 |" << std::endl
+		 << "-------------      -------------" << std::endl
+		 << "| " << gameBoard[0][0] << " | " << gameBoard[0][1] << " | " << gameBoard[0][2] << " |      | 1 | 2 | 3 |" << std::endl
+		 << "-------------      -------------" << std::endl;
 }
 
 void Game::ResetBoard()
 {
-	int i = 0;
-	for (char character : pos)
+	for (unsigned int i = 0; i < 3; i++)
 	{
-		pos[i] = ' ';
-		i++;
+		for (unsigned int j = 0; j < 3; j++)
+		{
+			gameBoard[i][j] = freeMarker;
+		}
 	}
 }
 
-void Game::InsertMarker(char team1, char team2, int index, bool playerOneTurn)
+int Game::GetFirstIndex(unsigned int index)
 {
+	if (index > 6)
+	{
+		return 2;
+	}
+	else if (index > 3 && index < 7)
+	{
+		return 1;
+	}
+	else //(index < 4)
+	{
+		return 0;
+	}
+}
+
+int Game::GetSecondIndex(unsigned int index)
+{
+	if (index > 6)
+	{
+		return index - 7;
+	}
+	else if (index > 3 && index < 7)
+	{
+		return index - 4;
+	}
+	else //(index < 4)
+	{
+		return index - 1;
+	}
+}
+
+void Game::InsertMarker(unsigned int index, bool playerOneTurn)
+{
+	unsigned int i = GetFirstIndex(index);
+	unsigned int j = GetSecondIndex(index);
 	if (playerOneTurn)
 	{
-		pos[index] = team1;
+		gameBoard[i][j] = humanPlayer;
 	}
 	else 
 	{
-		pos[index] = team2;
+		gameBoard[i][j] = aiPlayer;
 	}
 }
 
 bool Game::CheckWin()
 {
-	if (pos[0] != ' ')
+	for (unsigned int i = 0; i < 3; i++)
 	{
-		if ((pos[0] == pos[1] && pos[0] == pos[2]) || (pos[0] == pos[3] && pos[0] == pos[6]) || (pos[0] == pos[4] && pos[0] == pos[8]))
+		// Check horizontals
+		if (gameBoard[i][0] != freeMarker)
+		{
+			if (gameBoard[i][0] == gameBoard[i][1] && gameBoard[i][0] == gameBoard[i][2])
+			{
+				return true;
+			}
+		}
+		// Check verticals
+		if (gameBoard[0][i] != freeMarker)
+		{
+			if (gameBoard[0][i] == gameBoard[1][i] && gameBoard[0][i] == gameBoard[2][i])
+			{
+				return true;
+			}
+		}
+	}
+	// Check diagonals
+	if (gameBoard[0][0] != freeMarker)
+	{
+		if (gameBoard[0][0] == gameBoard[1][1] && gameBoard[0][0] == gameBoard[2][2])
 		{
 			return true;
 		}
 	}
-	if (pos[4] != ' ')
+	if (gameBoard[0][2] != freeMarker)
 	{
-		if ((pos[4] == pos[3] && pos[4] == pos[5]) || (pos[4] == pos[1] && pos[4] == pos[7]) || (pos[4] == pos[6] && pos[4] == pos[2]))
-		{
-			return true;
-		}
-	}
-	if (pos[8] != ' ')
-	{
-		if ((pos[8] == pos[7] && pos[8] == pos[6]) || (pos[8] == pos[5] && pos[8] == pos[2]))
+		if (gameBoard[0][2] == gameBoard[1][1] && gameBoard[0][2] == gameBoard[2][0])
 		{
 			return true;
 		}
@@ -61,48 +116,37 @@ bool Game::CheckWin()
 	return false;
 }
 
-bool Game::CheckOccupied(char team1, char team2, int index)
+bool Game::CheckOccupied(unsigned int index)
 {
-	int i = 0;
-	for (char character : pos)
+	unsigned int firstIndex = GetFirstIndex(index);
+	unsigned int secondIndex = GetSecondIndex(index);
+	for (unsigned int i = 0; i < 3; i++)
 	{
-		if (i == index)
+		for (unsigned int j = 0; j < 3; j++)
 		{
-			if (pos[i] == team1 || pos[i] == team2)
+			if (i == firstIndex && j == secondIndex)
 			{
-				return true;
+				if (gameBoard[i][j] == humanPlayer || gameBoard[i][j] == aiPlayer)
+				{
+					return true;
+				}
 			}
 		}
-		i++;
 	}
 	return false;
 }
 
 bool Game::CheckFull()
 {
-	for (char character : pos)
+	for (unsigned int i = 0; i < 3; i++)
 	{
-		if (character == ' ')
+		for (unsigned int j = 0; j < 3; j++)
 		{
-			return false;
+			if (gameBoard[i][j] == freeMarker)
+			{
+				return false;
+			}
 		}
 	}
 	return true;
-}
-
-void Game::Pause()
-{
-	std::cin.clear();
-	std::cin.ignore();
-}
-
-void Game::ClearScreen()
-{
-#if defined _WIN32
-	system("cls");
-#elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__)
-	system("clear");
-#elif defined (__APPLE__)
-	system("clear");
-#endif
 }
