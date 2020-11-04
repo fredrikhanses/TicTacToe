@@ -1,2 +1,2 @@
 # TicTacToe
-FG19GP Artificiell Intelligens in game production
+FG19GP Artificial Intelligence in game production
